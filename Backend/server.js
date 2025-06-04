@@ -14,5 +14,6 @@ app.get("/", (req, res) => res.send("FootyVote API is running"));
 app.use("/users", userRoutes);
 app.use("/polls", pollRoutes);
 
+console.log("Login route registered!")
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
