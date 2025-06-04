@@ -1,5 +1,4 @@
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import { pool } from "../db/db.js";
 
 export const createPoll = async (req, res) => {
   try {
@@ -62,7 +61,9 @@ export const votePoll = async (req, res) => {
 
     // Validate user role
     if (role === "guest") {
-      return res.status(403).json({ message: "Only registered users can vote" });
+      return res
+        .status(403)
+        .json({ message: "Only registered users can vote" });
     }
 
     // Insert vote, preventing duplicate votes
@@ -72,7 +73,9 @@ export const votePoll = async (req, res) => {
     );
 
     if (!voteResult.rows.length) {
-      return res.status(400).json({ message: "You have already voted in this poll" });
+      return res
+        .status(400)
+        .json({ message: "You have already voted in this poll" });
     }
 
     res.status(200).json({ message: "Vote submitted successfully" });
@@ -114,10 +117,13 @@ export const deletePoll = async (req, res) => {
 
     // Delete poll and associated options
     await pool.query("DELETE FROM poll_options WHERE poll_id = $1", [pollId]);
-    const result = await pool.query("DELETE FROM polls WHERE poll_id = $1 RETURNING *", [pollId]);
+    const result = await pool.query(
+      "DELETE FROM polls WHERE poll_id = $1 RETURNING *",
+      [pollId]
+    );
 
     // Check if poll existed
-    if (result.rows.length === 0) {
+    if (result.rowCount === 0) {
       return res.status(404).json({ message: "Poll not found" });
     }
 
@@ -127,5 +133,3 @@ export const deletePoll = async (req, res) => {
     res.status(500).json({ message: "Error deleting poll", error });
   }
 };
-
-
