@@ -4,6 +4,8 @@ import dotenv from "dotenv";
 import userRoutes from "./src/routers/userRoutes.js";
 import pollRoutes from "./src/routers/pollRoutes.js";
 import comments from "./src/routers/comments.js";
+import { connectDB } from "./src/db/db.js";
+import { syncModels } from "./src/db/db.js";
 
 dotenv.config();
 
@@ -16,6 +18,13 @@ app.use("/users", userRoutes);
 app.use("/polls", pollRoutes);
 app.use("/comments", comments);
 
-console.log("Login route registered!");
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// Ensure database connection and model sync before starting the server
+const startServer = async () => {
+  await connectDB(); // Connect to PostgreSQL & Sequelize
+  await syncModels(); // Sync models to ensure they exist in DB
+
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+};
+
+startServer();
