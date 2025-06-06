@@ -10,7 +10,13 @@ const Poll = sequelize.define(
     title: { type: DataTypes.STRING, allowNull: false },
     category: { type: DataTypes.STRING },
     option_count: { type: DataTypes.INTEGER },
-    created_by: { type: DataTypes.INTEGER, allowNull: false },
+    created_by: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: { model: "users", key: "user_id" },
+    },
+    createdAt: { type: DataTypes.DATE, field: "created_at" },
+    updatedAt: { type: DataTypes.DATE },
   },
   { timestamps: true, tableName: "polls" }
 );

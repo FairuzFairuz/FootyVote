@@ -1,6 +1,11 @@
 import { pool } from "../db/db.js";
+import { sequelize } from "../db/db.js";
+import Poll from "../models/Poll.js";
+import PollOption from "../models/PollOption.js";
 
+//create poll
 export const createPoll = async (req, res) => {
+  const transaction = await sequelize.transaction();
   try {
     const { title, category, options } = req.body;
     const { userId, role } = req.user;
@@ -13,30 +18,53 @@ export const createPoll = async (req, res) => {
     }
 
     // Validate option count
-    if (!options || options.length > 3) {
-      return res.status(400).json({ message: "Max 3 options allowed" });
+    if (!options || options.length < 1 || options.length > 3) {
+      return res.status(400).json({ message: "Poll must have 1 to 3 options" });
     }
 
-    // Create Poll
-    const pollResult = await pool.query(
-      "INSERT INTO polls (created_by, title, category, option_count) VALUES ($1, $2, $3, $4) RETURNING poll_id",
-      [userId, title, category, options.length]
+    console.log("Received userId:", userId);
+    // Fetch username
+    const userResult = await pool.query(
+      "SELECT username FROM users WHERE user_id = $1",
+      [userId]
+    );
+    console.log("User query result:", userResult.rows);
+
+    if (!userResult.rows.length) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const username = userResult.rows[0].username;
+
+    // Create poll with correct `created_by`
+    const poll = await Poll.create(
+      {
+        created_by: userId, // Ensure created_by stores username correctly
+        title,
+        category,
+        option_count: options.length,
+        ends_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      },
+      { transaction }
     );
 
-    const pollId = pollResult.rows[0].poll_id;
-
-    // Insert Poll Options
-    const optionQueries = options.map((optionText) =>
-      pool.query(
-        "INSERT INTO poll_options (poll_id, option_text) VALUES ($1, $2)",
-        [pollId, optionText]
+    // Insert poll options
+    await Promise.all(
+      options.map((optionText) =>
+        PollOption.create(
+          { poll_id: poll.poll_id, option_text: optionText },
+          { transaction }
+        )
       )
     );
-    await Promise.all(optionQueries); // Runs all insert operations in parallel
 
-    res.status(201).json({ pollId, message: "Poll created successfully" });
+    await transaction.commit();
+    res
+      .status(201)
+      .json({ pollId: poll.poll_id, message: "Poll created successfully" });
   } catch (error) {
     console.error("Poll creation error:", error);
+    await transaction.rollback();
     res.status(500).json({ message: "Error creating poll", error });
   }
 };
