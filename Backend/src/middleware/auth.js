@@ -10,6 +10,10 @@ export const verifyToken = (req, res, next) => {
   }
 
   const token = authHeader.split(" ")[1]; // Extract token
+  // Debugging log
+  // Debugging log for secret key validation
+  console.log("ACCESS_SECRET in verifyToken:", process.env.ACCESS_SECRET);
+
   try {
     const verified = jwt.verify(token, process.env.ACCESS_SECRET);
     console.log("Decoded Token Payload:", verified); // Debugging
@@ -26,6 +30,8 @@ export const verifyToken = (req, res, next) => {
     };
 
     console.log("Authenticated User:", req.user); // Debugging
+    console.log("verifyToken executed for user:", req.user);
+
     next();
   } catch (error) {
     console.error("Token verification error:", error);

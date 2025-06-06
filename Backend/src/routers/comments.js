@@ -11,7 +11,7 @@ const router = express.Router();
 
 router.post("/:pollId", verifyToken, addComment);
 router.get("/:pollId", getComments);
-router.post("/:commentId", verifyToken, editComment);
 router.delete("/:commentId", verifyToken, deleteComment);
+router.post("/comments/:commentId", verifyToken, editComment);
 
 export default router;

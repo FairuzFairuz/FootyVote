@@ -1,5 +1,6 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../db/db.js";
+import Poll from "../models/Poll.js";
 
 const Comment = sequelize.define(
   "Comment",
