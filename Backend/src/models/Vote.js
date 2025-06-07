@@ -12,4 +12,17 @@ const Vote = sequelize.define(
   { timestamps: true, tableName: "votes" }
 );
 
-export default Vote;
+import Poll from "./Poll.js";
+import { User } from "./User.js";
+import PollOption from "./PollOption.js";
+const applyVoteAssociations = () => {
+  Vote.belongsTo(Poll, { foreignKey: "poll_id", onDelete: "CASCADE" });
+  Vote.belongsTo(User, { foreignKey: "user_id", onDelete: "CASCADE" });
+  Vote.belongsTo(PollOption, { foreignKey: "option_id", onDelete: "CASCADE" });
+
+  Poll.hasMany(Vote, { foreignKey: "poll_id" });
+  User.hasMany(Vote, { foreignKey: "user_id" });
+  PollOption.hasMany(Vote, { foreignKey: "option_id" });
+};
+
+export { Vote, applyVoteAssociations };
