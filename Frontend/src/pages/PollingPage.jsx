@@ -18,7 +18,7 @@ const PollingPage = ({ user }) => {
         if (!res.ok) throw new Error("Failed to fetch poll details");
 
         const data = await res.json();
-        console.log("Fetched poll details:", data); // ✅ Debugging
+        console.log("Fetched poll details:", data); // Debugging
         setPoll(data);
         setOptions(data.options);
       } catch (err) {
@@ -32,7 +32,7 @@ const PollingPage = ({ user }) => {
         if (!res.ok) throw new Error("Failed to fetch results");
 
         const data = await res.json();
-        console.log("Fetched poll results:", data); // ✅ Debugging entire response
+        console.log("Fetched poll results:", data); // Debugging
 
         // ✅ Ensure results is an array
         if (!Array.isArray(data.results)) {
@@ -40,14 +40,14 @@ const PollingPage = ({ user }) => {
             "Error: Expected results to be an array, received:",
             data.results
           );
-          setResults([]); // ✅ Prevents UI crashes
+          setResults([]); // Prevents UI crashes
           return;
         }
 
-        setResults(Array.isArray(data.results) ? data.results : []); // ✅ Store only results array
+        setResults(Array.isArray(data.results) ? data.results : []); // tore only results array
       } catch (err) {
         console.error("Results fetch error:", err.message);
-        setResults([]); // ✅ Default empty array to prevent issues
+        setResults([]); // Default empty array to prevent issues
       }
     };
 
@@ -56,7 +56,7 @@ const PollingPage = ({ user }) => {
   }, [pollId]);
 
   useEffect(() => {
-    console.log("PollingPage re-rendering with updated results:", results); // ✅ Debugging
+    console.log("PollingPage re-rendering with updated results:", results); // Debugging
   }, [results]);
 
   const handleVote = async () => {
@@ -76,7 +76,7 @@ const PollingPage = ({ user }) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${user.access}`, // ✅ Required for authentication
+          Authorization: `Bearer ${user.access}`, // Required for authentication
         },
         body: JSON.stringify({
           poll_id: pollId,
@@ -87,20 +87,20 @@ const PollingPage = ({ user }) => {
       if (!res.ok)
         throw new Error("Vote denied as you have voted in this poll before");
 
-      // ✅ Fetch updated poll results immediately after voting
+      // Fetch updated poll results immediately after voting
       const resultsRes = await fetch(`http://localhost:5000/votes/${pollId}`);
       const resultsData = await resultsRes.json();
-      console.log("Updated poll results:", resultsData); // ✅ Debugging
-      setResults([...resultsData.results]); // ✅ Update state
-      //   setRefreshKey((prevKey) => prevKey + 1); // ✅ Triggers UI refresh
+      console.log("Updated poll results:", resultsData); // Debugging
+      setResults([...resultsData.results]); // Update state
+      //   setRefreshKey((prevKey) => prevKey + 1); // Triggers UI refresh
     } catch (err) {
       console.error("Voting error:", err.message);
 
       if (err.message.includes("Vote denied")) {
-        // ✅ Checks for specific error message
-        alert("Vote denied as you have voted in this poll before."); // ✅ Displays custom message
+        // Checks for specific error message
+        alert("Vote denied as you have voted in this poll before."); // Displays custom message
       } else {
-        alert(err.message); // ✅ Shows other errors normally
+        alert(err.message); // Shows other errors normally
       }
     }
   };
@@ -112,15 +112,15 @@ const PollingPage = ({ user }) => {
         if (!res.ok) throw new Error("Failed to fetch comments");
 
         const data = await res.json();
-        console.log("Fetched comments:", data); // ✅ Debugging response
+        console.log("Fetched comments:", data); // Debugging response
 
-        // ✅ Access `data.comments` directly
+        // Access `data.comments` directly
         if (!Array.isArray(data.comments)) {
           console.error(
             "Error: Expected an array but received:",
             data.comments
           );
-          setComments([]); // ✅ Prevent UI crashes
+          setComments([]); // Prevent UI crashes
           return;
         }
 
@@ -128,7 +128,7 @@ const PollingPage = ({ user }) => {
           data.comments.sort(
             (a, b) => new Date(b.created_at) - new Date(a.created_at)
           )
-        ); // ✅ Newest first
+        ); // Newest first
       } catch (err) {
         console.error("Error fetching comments:", err.message);
       }
@@ -161,9 +161,9 @@ const PollingPage = ({ user }) => {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to post comment");
 
-      console.log("New comment added:", data); // ✅ Debugging
-      setComments([{ ...data.comment, username: user.username }, ...comments]); // ✅ Adds username from user state
-      setNewComment(""); // ✅ Clears input after posting
+      console.log("New comment added:", data); // Debugging
+      setComments([{ ...data.comment, username: user.username }, ...comments]); // Adds username from user state
+      setNewComment(""); // Clears input after posting
     } catch (err) {
       alert(err.message);
       console.error("Error posting comment:", err.message);
@@ -183,9 +183,8 @@ const PollingPage = ({ user }) => {
       user?.userId,
       "Comment Owner ID:",
       commentToDelete?.user_id
-    ); // ✅ Debugging
+    ); // Debugging
 
-    // ✅ Fix: Ensure correct comparison by using `userId`
     if (
       String(commentToDelete.user_id) !== String(user?.userId) &&
       user.role !== "admin"
@@ -202,8 +201,8 @@ const PollingPage = ({ user }) => {
 
       if (!res.ok) throw new Error("Failed to delete comment");
 
-      console.log("Comment deleted successfully:", commentId); // ✅ Debugging
-      setComments(comments.filter((c) => c.comment_id !== commentId)); // ✅ Instantly updates UI
+      console.log("Comment deleted successfully:", commentId); // Debugging
+      setComments(comments.filter((c) => c.comment_id !== commentId)); // Instantly updates UI
     } catch (err) {
       alert(err.message);
       console.error("Error deleting comment:", err.message);
@@ -270,7 +269,7 @@ const PollingPage = ({ user }) => {
     <div key={JSON.stringify(results)}>
       {" "}
       <h2>{poll.title}</h2>
-      <h3>Vote for an option:</h3>
+      <h3>Cast your vote!</h3>
       {options.map((opt) => (
         <div key={opt.option_id}>
           <label>
@@ -325,7 +324,6 @@ const PollingPage = ({ user }) => {
             {comment.comment_text}
           </p>
 
-          {/* ✅ Prevent crashes by checking if user exists */}
           {user && (
             <>
               <button onClick={() => handleEditComment(comment.comment_id)}>

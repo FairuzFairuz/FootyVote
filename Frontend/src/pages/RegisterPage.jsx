@@ -22,7 +22,7 @@ const RegisterPage = () => {
 
       if (!res.ok) throw new Error("Registration failed");
 
-      setSuccess("Registration successful! Please log in."); // ✅ Show message
+      setSuccess("Registration successful! Please log in."); // Show message
       setTimeout(() => navigate("/login"), 2000);
     } catch (err) {
       setError(err.message);
@@ -33,7 +33,7 @@ const RegisterPage = () => {
     <div>
       <h2>Register</h2>
       {success && <p style={{ color: "green" }}>{success}</p>}{" "}
-      {/* ✅ Display success message */}
+      {/* Display success message */}
       {error && <p style={{ color: "red" }}>{error}</p>}
       <button onClick={() => navigate("/")}>Home</button>
       <input

@@ -17,7 +17,7 @@ const LoginPage = ({ setUser }) => {
       if (!res.ok) throw new Error("Invalid login credentials");
 
       const data = await res.json();
-      console.log("Logged-in user data:", data); // ✅ Debugging
+      console.log("Logged-in user data:", data); // Debugging
 
       setUser({ ...data.user, access: data.access });
       navigate("/");

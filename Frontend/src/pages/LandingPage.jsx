@@ -32,7 +32,7 @@ const LandingPage = ({ user, handleLogout }) => {
       return;
     }
 
-    console.log("Admin deleting poll:", pollId); // ✅ Debugging
+    console.log("Admin deleting poll:", pollId); // Debugging
 
     try {
       const res = await fetch(`http://localhost:5000/polls/delete/${pollId}`, {
@@ -42,8 +42,8 @@ const LandingPage = ({ user, handleLogout }) => {
 
       if (!res.ok) throw new Error("Failed to delete poll");
 
-      console.log("Poll deleted successfully:", pollId); // ✅ Debugging
-      setPolls(polls.filter((poll) => poll.poll_id !== pollId)); // ✅ Instantly updates UI
+      console.log("Poll deleted successfully:", pollId); // Debugging
+      setPolls(polls.filter((poll) => poll.poll_id !== pollId)); // Instantly updates UI
     } catch (err) {
       console.error("Error deleting poll:", err.message);
       alert(err.message);
@@ -60,7 +60,7 @@ const LandingPage = ({ user, handleLogout }) => {
         </div>
       ) : (
         <div>
-          <h2>Welcome, {user.username}</h2>
+          <h2>{user.username} is back on the field!</h2>
           <button onClick={handleLogout}>Logout</button>{" "}
           {/* Create Poll button (Only for admins & advanced_registered users) */}
           {(user.role === "admin" || user.role === "advanced_registered") && (
@@ -86,7 +86,6 @@ const LandingPage = ({ user, handleLogout }) => {
               Vote
             </button>
 
-            {/* ✅ Admins can delete polls */}
             {user?.role === "admin" && (
               <button onClick={() => handleDeletePoll(poll.poll_id)}>
                 Delete Poll
