@@ -143,28 +143,22 @@ export const getPollResults = async (req, res) => {
 };
 
 export const deletePoll = async (req, res) => {
+  const { pollId } = req.params;
+
   try {
-    const { pollId } = req.params;
-    const { role } = req.user; // Extract user role from token
-
-    // Check if user is an admin
-    if (role !== "admin") {
-      return res.status(403).json({ message: "Only admins can delete polls" });
-    }
-
-    // Delete poll and associated options
-    await pool.query("DELETE FROM poll_options WHERE poll_id = $1", [pollId]);
-    const result = await pool.query(
-      "DELETE FROM polls WHERE poll_id = $1 RETURNING *",
+    // 🚨 First, delete votes linked to the poll
+    await pool.query(
+      "DELETE FROM votes WHERE option_id IN (SELECT option_id FROM poll_options WHERE poll_id = $1)",
       [pollId]
     );
 
-    // Check if poll existed
-    if (result.rowCount === 0) {
-      return res.status(404).json({ message: "Poll not found" });
-    }
+    // 🚨 Then, delete poll options
+    await pool.query("DELETE FROM poll_options WHERE poll_id = $1", [pollId]);
 
-    res.status(200).json({ message: "Poll deleted successfully" });
+    // 🚨 Finally, delete the poll itself
+    await pool.query("DELETE FROM polls WHERE poll_id = $1", [pollId]);
+
+    res.json({ message: "Poll deleted successfully" });
   } catch (error) {
     console.error("Error deleting poll:", error.message);
     res.status(500).json({ message: "Error deleting poll", error });

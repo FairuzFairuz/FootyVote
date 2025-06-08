@@ -26,6 +26,29 @@ const LandingPage = ({ user, handleLogout }) => {
     fetchPolls();
   }, []);
 
+  const handleDeletePoll = async (pollId) => {
+    if (!user || user.role !== "admin") {
+      alert("Only admins can delete polls.");
+      return;
+    }
+
+    console.log("Admin deleting poll:", pollId); // ✅ Debugging
+
+    try {
+      const res = await fetch(`http://localhost:5000/polls/delete/${pollId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${user.access}` },
+      });
+
+      if (!res.ok) throw new Error("Failed to delete poll");
+
+      console.log("Poll deleted successfully:", pollId); // ✅ Debugging
+      setPolls(polls.filter((poll) => poll.poll_id !== pollId)); // ✅ Instantly updates UI
+    } catch (err) {
+      console.error("Error deleting poll:", err.message);
+      alert(err.message);
+    }
+  };
   return (
     <div>
       <h1>FootyVote Polls</h1>
@@ -61,8 +84,14 @@ const LandingPage = ({ user, handleLogout }) => {
             </h4>
             <button onClick={() => navigate(`/polls/${poll.poll_id}`)}>
               Vote
-            </button>{" "}
-            {/* ✅ Navigate to PollingPage */}
+            </button>
+
+            {/* ✅ Admins can delete polls */}
+            {user?.role === "admin" && (
+              <button onClick={() => handleDeletePoll(poll.poll_id)}>
+                Delete Poll
+              </button>
+            )}
           </div>
         ))
       )}

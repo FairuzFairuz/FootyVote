@@ -224,9 +224,8 @@ const PollingPage = ({ user }) => {
       user?.userId,
       "Comment Owner ID:",
       commentToEdit?.user_id
-    ); // ✅ Debugging
+    ); // Debugging
 
-    // 🚨 Fix: Compare correctly using `userId`
     if (String(commentToEdit.user_id) !== String(user?.userId)) {
       console.error("User does not have permission to edit this comment.");
       alert("Only the author can edit this comment.");
@@ -300,8 +299,8 @@ const PollingPage = ({ user }) => {
       ) : (
         <p>No votes yet or loading results...</p>
       )}
-      <h3>Comments</h3>
-      <h3>Add a Comment</h3>
+      <h2>Time to be a Football Pundit!</h2>
+      <h3>Share your opinions</h3>
       {user &&
       ["admin", "advanced_registered", "default_registered"].includes(
         user.role
