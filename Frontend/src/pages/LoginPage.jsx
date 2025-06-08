@@ -19,7 +19,7 @@ const LoginPage = ({ setUser }) => {
       const data = await res.json();
       console.log("Logged-in user data:", data); // ✅ Debugging
 
-      setUser(data.user); // ✅ Make sure you're setting ONLY the user data
+      setUser({ ...data.user, access: data.access });
       navigate("/");
     } catch (err) {
       setError(err.message);

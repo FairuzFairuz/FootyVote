@@ -39,6 +39,12 @@ const LandingPage = ({ user, handleLogout }) => {
         <div>
           <h2>Welcome, {user.username}</h2>
           <button onClick={handleLogout}>Logout</button>{" "}
+          {/* Create Poll button (Only for admins & advanced_registered users) */}
+          {(user.role === "admin" || user.role === "advanced_registered") && (
+            <button onClick={() => navigate("/create-poll")}>
+              Create Poll
+            </button>
+          )}
         </div>
       )}
 

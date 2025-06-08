@@ -7,6 +7,7 @@ import PollOption from "../models/PollOption.js";
 export const createPoll = async (req, res) => {
   const transaction = await sequelize.transaction();
   try {
+    console.log("Received Request Body:", req.body);
     const { title, category, options } = req.body;
     const { userId, role } = req.user;
 
