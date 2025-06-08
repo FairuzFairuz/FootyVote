@@ -71,9 +71,15 @@ export const createPoll = async (req, res) => {
 
 export const getPolls = async (req, res) => {
   try {
-    const result = await pool.query(
-      "SELECT * FROM polls WHERE ends_at >= NOW() ORDER BY created_at DESC"
-    );
+    const result = await pool.query(`
+      SELECT p.poll_id, p.title, p.category, p.created_at, p.ends_at, p.option_count,
+             COUNT(v.vote_id) AS votes -- ✅ Count votes per poll correctly
+      FROM polls p
+      LEFT JOIN votes v ON p.poll_id = v.poll_id
+      WHERE p.ends_at >= NOW()
+      GROUP BY p.poll_id
+      ORDER BY created_at DESC
+    `);
 
     res.json(result.rows);
   } catch (error) {

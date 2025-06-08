@@ -14,6 +14,7 @@ const LandingPage = ({ user, handleLogout }) => {
         if (!res.ok) throw new Error("Failed to fetch polls");
 
         const data = await res.json();
+        console.log("Fetched Polls:", data);
         setPolls(data || []);
       } catch (err) {
         setError(err.message);
