@@ -4,15 +4,17 @@ import { useNavigate } from "react-router-dom";
 const CreatePoll = ({ user }) => {
   const navigate = useNavigate();
 
-  // ✅ Ensure only authorized users access this page
+  // Ensure only authorized users access this page
   if (!user || (user.role !== "admin" && user.role !== "advanced_registered")) {
-    return <h2>Unauthorized: You do not have permission to create polls.</h2>;
+    useEffect(() => {
+      navigate("/"); // Redirect unauthorized users
+    }, []);
+    return null;
   }
 
   const [title, setTitle] = useState("");
-  const [category, setCategory] = useState("Football");
+  const [category, setCategory] = useState("Players");
   const [options, setOptions] = useState(["", ""]); // Min 2 options
-  const [endsAt, setEndsAt] = useState("");
 
   const handleAddOption = () => {
     if (options.length < 3) setOptions([...options, ""]);
@@ -23,16 +25,21 @@ const CreatePoll = ({ user }) => {
   };
 
   const handleCreatePoll = async () => {
-    console.log("Creating poll with token:", user.access);
+    console.log("Creating poll with userId:", user?.userId); // Debugging
+
+    if (!title.trim() || options.some((opt) => !opt.trim())) {
+      alert("Poll title and options cannot be empty!");
+      return;
+    }
+
     try {
       const pollData = {
         created_by: user.userId,
         title,
-        category, // ✅ Add category selection
+        category, // Category selection remains
         options,
-        ends_at: endsAt,
       };
-      console.log("Poll creation payload:", pollData); // ✅ Debugging
+      console.log("Poll creation payload:", pollData); // Debugging
 
       const res = await fetch("http://localhost:5000/polls/create", {
         method: "POST",
@@ -45,7 +52,7 @@ const CreatePoll = ({ user }) => {
 
       if (!res.ok) throw new Error("Failed to create poll");
 
-      navigate("/"); // ✅ Redirect after success
+      navigate("/"); // Redirect after success
     } catch (err) {
       console.error("Poll creation error:", err.message);
     }
@@ -90,13 +97,6 @@ const CreatePoll = ({ user }) => {
       {options.length < 3 && (
         <button onClick={handleAddOption}>Add Option</button>
       )}
-
-      <h3>Poll End Date</h3>
-      <input
-        type="datetime-local"
-        value={endsAt}
-        onChange={(e) => setEndsAt(e.target.value)}
-      />
 
       <button onClick={handleCreatePoll}>Submit Poll</button>
       <button onClick={() => navigate("/")}>Home</button>
