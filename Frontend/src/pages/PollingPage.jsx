@@ -8,7 +8,8 @@ const PollingPage = ({ user }) => {
   const [options, setOptions] = useState([]);
   const [results, setResults] = useState({});
   const [selectedOption, setSelectedOption] = useState(null);
-  const [refreshKey, setRefreshKey] = useState(0);
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState("");
 
   useEffect(() => {
     const fetchPollDetails = async () => {
@@ -91,7 +92,7 @@ const PollingPage = ({ user }) => {
       const resultsData = await resultsRes.json();
       console.log("Updated poll results:", resultsData); // ✅ Debugging
       setResults([...resultsData.results]); // ✅ Update state
-      setRefreshKey((prevKey) => prevKey + 1); // ✅ Triggers UI refresh
+      //   setRefreshKey((prevKey) => prevKey + 1); // ✅ Triggers UI refresh
     } catch (err) {
       console.error("Voting error:", err.message);
 
@@ -101,6 +102,125 @@ const PollingPage = ({ user }) => {
       } else {
         alert(err.message); // ✅ Shows other errors normally
       }
+    }
+  };
+
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/comments/${pollId}`);
+        if (!res.ok) throw new Error("Failed to fetch comments");
+
+        const data = await res.json();
+        console.log("Fetched comments:", data); // ✅ Debugging response
+
+        // ✅ Access `data.comments` directly
+        if (!Array.isArray(data.comments)) {
+          console.error(
+            "Error: Expected an array but received:",
+            data.comments
+          );
+          setComments([]); // ✅ Prevent UI crashes
+          return;
+        }
+
+        setComments(
+          data.comments.sort(
+            (a, b) => new Date(b.created_at) - new Date(a.created_at)
+          )
+        ); // ✅ Newest first
+      } catch (err) {
+        console.error("Error fetching comments:", err.message);
+      }
+    };
+
+    fetchComments();
+  }, [pollId]);
+
+  const handlePostComment = async () => {
+    if (
+      !user ||
+      !["admin", "advanced_registered", "default_registered"].includes(
+        user.role
+      )
+    ) {
+      alert("You must be logged in to post a comment.");
+      return;
+    }
+
+    try {
+      const res = await fetch(`http://localhost:5000/comments/${pollId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.access}`,
+        },
+        body: JSON.stringify({ comment_text: newComment }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to post comment");
+
+      console.log("New comment added:", data); // ✅ Debugging
+      setComments([{ ...data.comment, username: user.username }, ...comments]); // ✅ Adds username from user state
+      setNewComment(""); // ✅ Clears input after posting
+    } catch (err) {
+      alert(err.message);
+      console.error("Error posting comment:", err.message);
+    }
+  };
+
+  const handleDeleteComment = async (commentId) => {
+    try {
+      const res = await fetch(`http://localhost:5000/comments/${commentId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${user.access}` },
+      });
+
+      if (!res.ok) throw new Error("Failed to delete comment");
+
+      console.log("Comment deleted:", commentId); // ✅ Debugging
+      setComments(comments.filter((c) => c.comment_id !== commentId)); // ✅ Instantly updates UI
+    } catch (err) {
+      alert(err.message);
+      console.error("Error deleting comment:", err.message);
+    }
+  };
+
+  const handleEditComment = async (commentId) => {
+    const editedText = prompt(
+      "Edit your comment:",
+      comments.find((c) => c.comment_id === commentId).comment_text
+    );
+    if (!editedText) return;
+
+    try {
+      const res = await fetch(
+        `http://localhost:5000/comments/comments/${commentId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user.access}`,
+          },
+          body: JSON.stringify({ comment_text: editedText }),
+        }
+      );
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to edit comment");
+
+      console.log("Comment edited:", data); // ✅ Debugging
+      setComments(
+        comments.map((c) =>
+          c.comment_id === commentId
+            ? { ...data.comment, username: c.username }
+            : c
+        )
+      ); // ✅ Preserves existing username
+    } catch (err) {
+      alert(err.message);
+      console.error("Error editing comment:", err.message);
     }
   };
 
@@ -140,6 +260,46 @@ const PollingPage = ({ user }) => {
       ) : (
         <p>No votes yet or loading results...</p>
       )}
+      <h3>Comments</h3>
+      <h3>Add a Comment</h3>
+      {user &&
+      ["admin", "advanced_registered", "default_registered"].includes(
+        user.role
+      ) ? (
+        <>
+          <textarea
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            placeholder="Write your comment..."
+            rows="3"
+            cols="50"
+          ></textarea>
+          <button onClick={handlePostComment}>Submit Comment</button>
+        </>
+      ) : (
+        <p>Login to post a comment.</p>
+      )}
+      {comments.map((comment) => (
+        <div key={comment.comment_id} className="comment">
+          <p>
+            <strong>{comment.username || "Unknown User"}:</strong>{" "}
+            {/* ✅ Uses correct field */}
+            {comment.comment_text}
+          </p>
+
+          {user &&
+            (user.user_id === comment.user_id || user.role === "admin") && (
+              <>
+                <button onClick={() => handleEditComment(comment.comment_id)}>
+                  Edit
+                </button>
+                <button onClick={() => handleDeleteComment(comment.comment_id)}>
+                  Delete
+                </button>
+              </>
+            )}
+        </div>
+      ))}
       <button onClick={() => navigate("/")}>Back</button>
     </div>
   );
