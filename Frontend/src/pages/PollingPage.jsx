@@ -171,15 +171,38 @@ const PollingPage = ({ user }) => {
   };
 
   const handleDeleteComment = async (commentId) => {
+    const commentToDelete = comments.find((c) => c.comment_id === commentId);
+
+    if (!commentToDelete) {
+      alert("Comment not found.");
+      return;
+    }
+
+    console.log(
+      "Logged-in User ID:",
+      user?.userId,
+      "Comment Owner ID:",
+      commentToDelete?.user_id
+    ); // ✅ Debugging
+
+    // ✅ Fix: Ensure correct comparison by using `userId`
+    if (
+      String(commentToDelete.user_id) !== String(user?.userId) &&
+      user.role !== "admin"
+    ) {
+      alert("You can only delete your own comments unless you're an admin.");
+      return;
+    }
+
     try {
       const res = await fetch(`http://localhost:5000/comments/${commentId}`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${user.access}` },
+        headers: { Authorization: `Bearer ${user?.access}` },
       });
 
       if (!res.ok) throw new Error("Failed to delete comment");
 
-      console.log("Comment deleted:", commentId); // ✅ Debugging
+      console.log("Comment deleted successfully:", commentId); // ✅ Debugging
       setComments(comments.filter((c) => c.comment_id !== commentId)); // ✅ Instantly updates UI
     } catch (err) {
       alert(err.message);
@@ -188,10 +211,29 @@ const PollingPage = ({ user }) => {
   };
 
   const handleEditComment = async (commentId) => {
-    const editedText = prompt(
-      "Edit your comment:",
-      comments.find((c) => c.comment_id === commentId).comment_text
-    );
+    const commentToEdit = comments.find((c) => c.comment_id === commentId);
+
+    if (!commentToEdit) {
+      alert("Comment not found.");
+      return;
+    }
+
+    console.log("Trying to edit comment:", commentId);
+    console.log(
+      "Logged-in User ID:",
+      user?.userId,
+      "Comment Owner ID:",
+      commentToEdit?.user_id
+    ); // ✅ Debugging
+
+    // 🚨 Fix: Compare correctly using `userId`
+    if (String(commentToEdit.user_id) !== String(user?.userId)) {
+      console.error("User does not have permission to edit this comment.");
+      alert("Only the author can edit this comment.");
+      return;
+    }
+
+    const editedText = prompt("Edit your comment:", commentToEdit.comment_text);
     if (!editedText) return;
 
     try {
@@ -201,7 +243,7 @@ const PollingPage = ({ user }) => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${user.access}`,
+            Authorization: `Bearer ${user?.access}`,
           },
           body: JSON.stringify({ comment_text: editedText }),
         }
@@ -210,17 +252,16 @@ const PollingPage = ({ user }) => {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to edit comment");
 
-      console.log("Comment edited:", data); // ✅ Debugging
       setComments(
         comments.map((c) =>
           c.comment_id === commentId
             ? { ...data.comment, username: c.username }
             : c
         )
-      ); // ✅ Preserves existing username
+      );
     } catch (err) {
-      alert(err.message);
       console.error("Error editing comment:", err.message);
+      alert(err.message);
     }
   };
 
@@ -229,7 +270,6 @@ const PollingPage = ({ user }) => {
   return (
     <div key={JSON.stringify(results)}>
       {" "}
-      {/* ✅ Forces UI refresh when results change */}
       <h2>{poll.title}</h2>
       <h3>Vote for an option:</h3>
       {options.map((opt) => (
@@ -283,21 +323,21 @@ const PollingPage = ({ user }) => {
         <div key={comment.comment_id} className="comment">
           <p>
             <strong>{comment.username || "Unknown User"}:</strong>{" "}
-            {/* ✅ Uses correct field */}
             {comment.comment_text}
           </p>
 
-          {user &&
-            (user.user_id === comment.user_id || user.role === "admin") && (
-              <>
-                <button onClick={() => handleEditComment(comment.comment_id)}>
-                  Edit
-                </button>
-                <button onClick={() => handleDeleteComment(comment.comment_id)}>
-                  Delete
-                </button>
-              </>
-            )}
+          {/* ✅ Prevent crashes by checking if user exists */}
+          {user && (
+            <>
+              <button onClick={() => handleEditComment(comment.comment_id)}>
+                Edit
+              </button>
+
+              <button onClick={() => handleDeleteComment(comment.comment_id)}>
+                Delete
+              </button>
+            </>
+          )}
         </div>
       ))}
       <button onClick={() => navigate("/")}>Back</button>
