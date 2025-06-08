@@ -4,6 +4,7 @@ import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import CreatePoll from "./pages/CreatePolls";
+import PollingPage from "./pages/PollingPage";
 
 function App() {
   const [user, setUser] = useState(null); //Lifted state up for authentication
@@ -21,6 +22,7 @@ function App() {
         <Route path="/login" element={<LoginPage setUser={setUser} />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/create-poll" element={<CreatePoll user={user} />} />
+        <Route path="/polls/:pollId" element={<PollingPage user={user} />} />
       </Routes>
     </Router>
   );

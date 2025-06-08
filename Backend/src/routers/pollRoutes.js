@@ -4,6 +4,7 @@ import { verifyToken } from "../middleware/auth.js";
 import {
   createPoll,
   deletePoll,
+  getPollById,
   getPollResults,
   getPolls,
   votePoll,
@@ -26,5 +27,6 @@ router.post(
 );
 router.get("/results/:pollId", getPollResults);
 router.delete("/delete/:pollId", verifyToken, checkRole(["admin"]), deletePoll);
+router.get("/:pollId", getPollById);
 
 export default router;

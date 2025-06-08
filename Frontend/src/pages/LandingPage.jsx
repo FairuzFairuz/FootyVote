@@ -48,16 +48,22 @@ const LandingPage = ({ user, handleLogout }) => {
         </div>
       )}
 
-      <h3>Top Polls</h3>
+      <h3>Latest Polls</h3>
       {loading ? (
         <p>Loading polls...</p>
       ) : error ? (
         <p>{error}</p>
       ) : (
         polls.map((poll) => (
-          <h4 key={poll.id}>
-            {poll.title} - {poll.votes} votes
-          </h4>
+          <div key={poll.poll_id}>
+            <h4>
+              {poll.title} - {poll.votes} votes
+            </h4>
+            <button onClick={() => navigate(`/polls/${poll.poll_id}`)}>
+              Vote
+            </button>{" "}
+            {/* ✅ Navigate to PollingPage */}
+          </div>
         ))
       )}
     </div>

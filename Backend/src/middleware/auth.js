@@ -10,7 +10,7 @@ export const verifyToken = (req, res, next) => {
   }
 
   const token = authHeader.split(" ")[1]; // Extract token
-  // Debugging log
+ 
   // Debugging log for secret key validation
   console.log("ACCESS_SECRET in verifyToken:", process.env.ACCESS_SECRET);
 

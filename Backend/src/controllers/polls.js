@@ -91,6 +91,8 @@ export const getPolls = async (req, res) => {
 
 export const votePoll = async (req, res) => {
   try {
+    console.log("Received vote request:", req.body); // ✅ Debugging
+
     const { pollId, optionId } = req.body;
     const { userId, role } = req.user;
 
@@ -166,5 +168,38 @@ export const deletePoll = async (req, res) => {
   } catch (error) {
     console.error("Error deleting poll:", error.message);
     res.status(500).json({ message: "Error deleting poll", error });
+  }
+};
+
+export const getPollById = async (req, res) => {
+  try {
+    const { pollId } = req.params;
+    console.log("Fetching poll details for ID:", pollId); // ✅ Debugging
+
+    // Fetch poll details
+    const pollResult = await pool.query(
+      "SELECT * FROM polls WHERE poll_id = $1",
+      [pollId]
+    );
+    if (pollResult.rowCount === 0) {
+      return res.status(404).json({ message: "Poll not found" }); // 🚨 Prevents HTML error responses
+    }
+
+    // Fetch poll options
+    const optionsResult = await pool.query(
+      "SELECT * FROM poll_options WHERE poll_id = $1",
+      [pollId]
+    );
+
+    // Combine poll and options
+    const pollDetails = {
+      ...pollResult.rows[0],
+      options: optionsResult.rows,
+    };
+
+    res.json(pollDetails);
+  } catch (error) {
+    console.error("Error fetching poll details:", error.message);
+    res.status(500).json({ message: "Error retrieving poll", error });
   }
 };
