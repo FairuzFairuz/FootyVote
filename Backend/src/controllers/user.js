@@ -155,7 +155,15 @@ export const login = async (req, res) => {
       jwtid: uuidv4(),
     });
 
-    res.json({ access, refresh });
+    res.json({
+      user: {
+        userId: auth.user_id,
+        username: auth.username,
+        role: auth.role,
+      },
+      access,
+      refresh,
+    });
   } catch (error) {
     console.error("Login error:", error.message);
     res.status(500).json({ status: "error", msg: "Login failed" });
