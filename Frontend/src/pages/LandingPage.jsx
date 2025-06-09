@@ -70,7 +70,7 @@ const LandingPage = ({ user, handleLogout }) => {
           )}
         </div>
       )}
-
+      
       <h3>Latest Polls</h3>
       {loading ? (
         <p>Loading polls...</p>
