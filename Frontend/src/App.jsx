@@ -22,7 +22,6 @@ function App() {
         <Route path="/login" element={<LoginPage setUser={setUser} />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/create-poll" element={<CreatePoll user={user} />} />
-        console.log("User passed to PollingPage:", user);
         <Route path="/polls/:pollId" element={<PollingPage user={user} />} />
       </Routes>
     </Router>
