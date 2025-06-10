@@ -27,21 +27,55 @@ const LoginPage = ({ setUser }) => {
   };
 
   return (
-    <div>
-      <h2>Login</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      <button onClick={() => navigate("/")}>Home</button>
-      <input
-        type="email"
-        placeholder="Email"
-        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-      />
-      <button onClick={handleLogin}>Login</button>
+    <div className="container d-flex justify-content-center align-items-center min-vh-100">
+      <div
+        className="card p-4 shadow-lg border-0"
+        style={{ maxWidth: "1000px", width: "100%" }}
+      >
+        <h2 className="text-center text-warning fw-bold">Login</h2>
+
+        {error && <p className="text-danger text-center">{error}</p>}
+
+        <div className="mb-3">
+          <label className="form-label">Email</label>
+          <input
+            type="email"
+            className="form-control"
+            placeholder="Enter your email"
+            onChange={(e) =>
+              setFormData({ ...formData, email: e.target.value })
+            }
+          />
+        </div>
+
+        <div className="mb-3">
+          <label className="form-label">Password</label>
+          <input
+            type="password"
+            className="form-control"
+            placeholder="Enter your password"
+            onChange={(e) =>
+              setFormData({ ...formData, password: e.target.value })
+            }
+          />
+        </div>
+
+        <button
+          className="btn btn-warning w-100"
+          onClick={() => handleLogin(formData)}
+        >
+          Login
+        </button>
+
+        <div className="text-center mt-3">
+          <button
+            className="btn btn-link text-secondary"
+            onClick={() => navigate("/")}
+          >
+            Back to Home
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

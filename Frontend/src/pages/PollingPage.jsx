@@ -266,78 +266,124 @@ const PollingPage = ({ user }) => {
   if (!poll) return <h2>Loading poll...</h2>;
 
   return (
-    <div key={JSON.stringify(results)}>
-      {" "}
-      <h2>{poll.title}</h2>
-      <h3>Cast your vote!</h3>
-      {options.map((opt) => (
-        <div key={opt.option_id}>
-          <label>
-            <input
-              type="radio"
-              name="vote"
-              value={opt.option_id}
-              onChange={() => setSelectedOption(opt.option_id)}
-            />
-            {opt.option_text}
-          </label>
+    <div className="container d-flex justify-content-center align-items-center min-vh-100">
+      <div
+        className="card p-4 shadow-lg border-0"
+        style={{ maxWidth: "1200px", width: "100%" }}
+      >
+        <h1 className="text-center text-warning fw-bold">{poll.title}</h1>
+        <h2 className="text-center text-dark fw-bold">Cast your vote!</h2>
+
+        {/* Voting Options */}
+        <div className="d-flex flex-wrap gap-3 justify-content-center mb-4">
+          {" "}
+          {/* Added margin-bottom */}
+          {options.map((opt) => (
+            <div
+              key={opt.option_id}
+              className={`card p-3 shadow-lg text-center ${
+                selectedOption === opt.option_id ? "border-warning" : "border-2"
+              }`}
+              style={{ width: "200px", cursor: "pointer" }}
+              onClick={() => setSelectedOption(opt.option_id)}
+            >
+              <h5 className="fw-bold">{opt.option_text}</h5>
+            </div>
+          ))}
         </div>
-      ))}
-      <button onClick={handleVote}>Submit Vote</button>
-      <h3>Current Results:</h3>
-      {console.log("Results inside return:", results)}
-      {Array.isArray(results) && results.length > 0 ? (
-        options.map((opt) => {
-          const match = results.find((r) => r.option_id === opt.option_id);
-          return (
-            <p key={opt.option_id}>
-              {opt.option_text}: {match ? match.vote_count : 0} votes
-            </p>
-          );
-        })
-      ) : (
-        <p>No votes yet or loading results...</p>
-      )}
-      <h2>Time to be a Football Pundit!</h2>
-      <h3>Share your opinions</h3>
-      {user &&
-      ["admin", "advanced_registered", "default_registered"].includes(
-        user.role
-      ) ? (
-        <>
-          <textarea
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            placeholder="Write your comment..."
-            rows="3"
-            cols="50"
-          ></textarea>
-          <button onClick={handlePostComment}>Submit Comment</button>
-        </>
-      ) : (
-        <p>Login to post a comment.</p>
-      )}
-      {comments.map((comment) => (
-        <div key={comment.comment_id} className="comment">
-          <p>
-            <strong>{comment.username || "Unknown User"}:</strong>{" "}
-            {comment.comment_text}
+
+        <button className="btn btn-warning w-70" onClick={handleVote}>
+          Submit Vote
+        </button>
+
+        {/* Poll Results */}
+        <h2 className="text-center text-dark fw-bold mt-4">Current Results:</h2>
+        {Array.isArray(results) && results.length > 0 ? (
+          options.map((opt) => {
+            const match = results.find((r) => r.option_id === opt.option_id);
+            return (
+              <p key={opt.option_id} className="text-secondary fs-5">
+                {opt.option_text}:{" "}
+                <strong>{match ? match.vote_count : 0}</strong> votes
+              </p>
+            );
+          })
+        ) : (
+          <p className="text-center text-muted">
+            No votes yet or loading results...
           </p>
+        )}
 
-          {user && (
-            <>
-              <button onClick={() => handleEditComment(comment.comment_id)}>
-                Edit
-              </button>
+        {/* Comments Section */}
+        <h2 className="text-center text-dark fw-bold mt-4">
+          Time to be a Football Pundit!
+        </h2>
+        <h3 className="text-center text-secondary">Share your opinions</h3>
 
-              <button onClick={() => handleDeleteComment(comment.comment_id)}>
-                Delete
-              </button>
-            </>
-          )}
+        {user &&
+        ["admin", "advanced_registered", "default_registered"].includes(
+          user.role
+        ) ? (
+          <div className="mb-3">
+            <textarea
+              className="form-control border-warning border-2"
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              placeholder="Write your comment..."
+              rows="3"
+            ></textarea>
+            <button
+              className="btn btn-warning w-100 mt-2"
+              onClick={handlePostComment}
+            >
+              Submit Comment
+            </button>
+          </div>
+        ) : (
+          <p className="text-center text-muted">Login to post a comment.</p>
+        )}
+
+        {/* Display Comments */}
+        <div className="mt-3 fs-5">
+          {comments.map((comment) => (
+            <div
+              key={comment.comment_id}
+              className="border border-warning border-2 p-2 rounded mb-4"
+            >
+              <p>
+                <strong>{comment.username || "Unknown User"}:</strong>{" "}
+                {comment.comment_text}
+              </p>
+
+              {user && (
+                <div className="d-flex gap-2">
+                  <button
+                    className="btn btn-outline-dark btn-sm"
+                    onClick={() => handleEditComment(comment.comment_id)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="btn btn-outline-danger btn-sm"
+                    onClick={() => handleDeleteComment(comment.comment_id)}
+                  >
+                    Delete
+                  </button>
+                </div>
+              )}
+            </div>
+          ))}
         </div>
-      ))}
-      <button onClick={() => navigate("/")}>Back</button>
+
+        <div className="text-center mt-3">
+          <button
+            className="btn btn-link text-secondary"
+            onClick={() => navigate("/")}
+          >
+            Back to Home
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

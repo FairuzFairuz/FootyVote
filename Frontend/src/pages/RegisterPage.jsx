@@ -30,35 +30,80 @@ const RegisterPage = () => {
   };
 
   return (
-    <div>
-      <h2>Register</h2>
-      {success && <p style={{ color: "green" }}>{success}</p>}{" "}
-      {/* Display success message */}
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      <button onClick={() => navigate("/")}>Home</button>
-      <input
-        type="email"
-        placeholder="Email"
-        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-      />
-      <input
-        type="text"
-        placeholder="Username"
-        onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-      />
-      <select
-        onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+    <div className="container d-flex justify-content-center align-items-center min-vh-100">
+      <div
+        className="card p-4 shadow-lg border-0"
+        style={{ maxWidth: "1000px", width: "100%" }}
       >
-        <option value="default_registered">Default Registered</option>
-        <option value="advanced_registered">Advanced Registered</option>
-        <option value="admin">Admin</option>
-      </select>
-      <button onClick={handleRegister}>Register</button>
+        <h2 className="text-center text-warning fw-bold">Register</h2>
+
+        {success && <p className="text-success text-center">{success}</p>}
+        {error && <p className="text-danger text-center">{error}</p>}
+
+        <div className="mb-3">
+          <label className="form-label">Email</label>
+          <input
+            type="email"
+            className="form-control"
+            placeholder="Enter your email"
+            onChange={(e) =>
+              setFormData({ ...formData, email: e.target.value })
+            }
+          />
+        </div>
+
+        <div className="mb-3">
+          <label className="form-label">Username</label>
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Enter your username"
+            onChange={(e) =>
+              setFormData({ ...formData, username: e.target.value })
+            }
+          />
+        </div>
+
+        <div className="mb-3">
+          <label className="form-label">Password</label>
+          <input
+            type="password"
+            className="form-control"
+            placeholder="Enter your password"
+            onChange={(e) =>
+              setFormData({ ...formData, password: e.target.value })
+            }
+          />
+        </div>
+
+        <div className="mb-3">
+          <label className="form-label">Role</label>
+          <select
+            className="form-select"
+            onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+          >
+            <option value="default_registered">Default Registered</option>
+            <option value="advanced_registered">Advanced Registered</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+
+        <button
+          className="btn btn-warning w-100"
+          onClick={() => handleRegister(formData)}
+        >
+          Register
+        </button>
+
+        <div className="text-center mt-3">
+          <button
+            className="btn btn-link text-secondary"
+            onClick={() => navigate("/")}
+          >
+            Back to Home
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

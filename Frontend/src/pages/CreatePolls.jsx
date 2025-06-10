@@ -59,47 +59,95 @@ const CreatePoll = ({ user }) => {
   };
 
   return (
-    <div>
-      <h2>Create a New Poll</h2>
-      <input
-        type="text"
-        placeholder="Poll Title"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-      />
-      <h3>Category</h3>
-      <select value={category} onChange={(e) => setCategory(e.target.value)}>
-        <option value="Players">Players</option>
-        <option value="Stadiums">Stadiums</option>
-        <option value="Managers">Managers</option>
-        <option value="Teams">Teams</option>
-        <option value="Others">Others</option>
-      </select>
+    <div className="container d-flex justify-content-center align-items-center min-vh-100">
+      <div
+        className="card p-4 shadow-lg border-0"
+        style={{ maxWidth: "500px", width: "100%" }}
+      >
+        <h2 className="text-center text-warning fw-bold">Create a New Poll</h2>
 
-      <h3>Poll Options</h3>
-      {options.map((option, index) => (
-        <div key={index}>
+        {/* Poll Title */}
+        <div className="mb-3">
+          <label className="form-label">Poll Title</label>
           <input
             type="text"
-            placeholder={`Option ${index + 1}`}
-            value={option}
-            onChange={(e) => {
-              const updatedOptions = [...options];
-              updatedOptions[index] = e.target.value;
-              setOptions(updatedOptions);
-            }}
+            className="form-control"
+            placeholder="Enter poll title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
           />
-          {options.length > 2 && (
-            <button onClick={() => handleRemoveOption(index)}>Remove</button>
+        </div>
+
+        {/* Category Selection */}
+        <div className="mb-3">
+          <label className="form-label">Category</label>
+          <select
+            className="form-select"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+          >
+            <option value="Players">Players</option>
+            <option value="Stadiums">Stadiums</option>
+            <option value="Managers">Managers</option>
+            <option value="Teams">Teams</option>
+            <option value="Others">Others</option>
+          </select>
+        </div>
+
+        {/* Poll Options */}
+        <div className="mb-3">
+          <label className="form-label">Poll Options</label>
+          {options.map((option, index) => (
+            <div key={index} className="input-group mb-2">
+              <input
+                type="text"
+                className="form-control"
+                placeholder={`Option ${index + 1}`}
+                value={option}
+                onChange={(e) => {
+                  const updatedOptions = [...options];
+                  updatedOptions[index] = e.target.value;
+                  setOptions(updatedOptions);
+                }}
+              />
+              {options.length > 2 && (
+                <button
+                  className="btn btn-outline-danger"
+                  onClick={() => handleRemoveOption(index)}
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+          ))}
+          {options.length < 5 && (
+            <button
+              className="btn btn-outline-warning w-100 mt-2"
+              onClick={handleAddOption}
+            >
+              Add Option
+            </button>
           )}
         </div>
-      ))}
-      {options.length < 3 && (
-        <button onClick={handleAddOption}>Add Option</button>
-      )}
 
-      <button onClick={handleCreatePoll}>Submit Poll</button>
-      <button onClick={() => navigate("/")}>Home</button>
+        {/* Submit Button */}
+        <button
+          className="btn btn-warning w-100"
+          onClick={() => handleCreatePoll({ title, category, options })}
+        >
+          Submit Poll
+        </button>
+
+        {/* Navigation */}
+        <div className="text-center mt-3">
+          <button
+            className="btn btn-link text-secondary"
+            onClick={() => navigate("/")}
+          >
+            Back to Home
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
