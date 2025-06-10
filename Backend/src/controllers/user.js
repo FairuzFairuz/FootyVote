@@ -86,7 +86,7 @@ export const updateUser = async (req, res) => {
 // Delete User
 export const deleteUser = async (req, res) => {
   try {
-    const { userId } = req.params; // ✅ Ensure userId is coming from request parameters
+    const { userId } = req.params; // Ensure userId is coming from request parameters
     if (!userId) {
       return res.status(400).json({ status: "error", msg: "Missing user ID" });
     }

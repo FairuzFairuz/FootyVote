@@ -35,7 +35,7 @@ export const addVote = async (req, res) => {
   }
 };
 
-// ✅ Get Poll Results (Vote Count)
+// Get Poll Results (Vote Count)
 export const getPollResults = async (req, res) => {
   try {
     const { pollId } = req.params;

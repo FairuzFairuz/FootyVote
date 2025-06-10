@@ -44,7 +44,7 @@ export const createPoll = async (req, res) => {
         title,
         category,
         option_count: options.length,
-        ends_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        ends_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), //7 days converted to miliseconds
       },
       { transaction }
     );
@@ -74,7 +74,7 @@ export const getPolls = async (req, res) => {
   try {
     const result = await pool.query(`
       SELECT p.poll_id, p.title, p.category, p.created_at, p.ends_at, p.option_count,
-             COUNT(v.vote_id) AS votes -- ✅ Count votes per poll correctly
+             COUNT(v.vote_id) AS votes -- Count votes per poll correctly
       FROM polls p
       LEFT JOIN votes v ON p.poll_id = v.poll_id
       WHERE p.ends_at >= NOW()
@@ -91,7 +91,7 @@ export const getPolls = async (req, res) => {
 
 export const votePoll = async (req, res) => {
   try {
-    console.log("Received vote request:", req.body); // ✅ Debugging
+    console.log("Received vote request:", req.body); // Debugging
 
     const { pollId, optionId } = req.body;
     const { userId, role } = req.user;
@@ -146,16 +146,16 @@ export const deletePoll = async (req, res) => {
   const { pollId } = req.params;
 
   try {
-    // 🚨 First, delete votes linked to the poll
+    // First, delete votes linked to the poll
     await pool.query(
       "DELETE FROM votes WHERE option_id IN (SELECT option_id FROM poll_options WHERE poll_id = $1)",
       [pollId]
     );
 
-    // 🚨 Then, delete poll options
+    // Then, delete poll options
     await pool.query("DELETE FROM poll_options WHERE poll_id = $1", [pollId]);
 
-    // 🚨 Finally, delete the poll itself
+    // Finally, delete the poll itself
     await pool.query("DELETE FROM polls WHERE poll_id = $1", [pollId]);
 
     res.json({ message: "Poll deleted successfully" });
@@ -168,7 +168,7 @@ export const deletePoll = async (req, res) => {
 export const getPollById = async (req, res) => {
   try {
     const { pollId } = req.params;
-    console.log("Fetching poll details for ID:", pollId); // ✅ Debugging
+    console.log("Fetching poll details for ID:", pollId); // Debugging
 
     // Fetch poll details
     const pollResult = await pool.query(
@@ -176,7 +176,7 @@ export const getPollById = async (req, res) => {
       [pollId]
     );
     if (pollResult.rowCount === 0) {
-      return res.status(404).json({ message: "Poll not found" }); // 🚨 Prevents HTML error responses
+      return res.status(404).json({ message: "Poll not found" }); // Prevents HTML error responses
     }
 
     // Fetch poll options
