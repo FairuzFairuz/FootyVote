@@ -1,13 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Container,
-  Grid,
-  Card,
-  Button,
-  Typography,
-  CircularProgress,
-} from "@mui/material";
 
 const LandingPage = ({ user, handleLogout }) => {
   const navigate = useNavigate();
