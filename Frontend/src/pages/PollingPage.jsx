@@ -34,7 +34,7 @@ const PollingPage = ({ user }) => {
         const data = await res.json();
         console.log("Fetched poll results:", data); // Debugging
 
-        // ✅ Ensure results is an array
+        // Ensure results is an array
         if (!Array.isArray(data.results)) {
           console.error(
             "Error: Expected results to be an array, received:",
@@ -44,7 +44,7 @@ const PollingPage = ({ user }) => {
           return;
         }
 
-        setResults(Array.isArray(data.results) ? data.results : []); // tore only results array
+        setResults(Array.isArray(data.results) ? data.results : []); // store only results array
       } catch (err) {
         console.error("Results fetch error:", err.message);
         setResults([]); // Default empty array to prevent issues
@@ -66,7 +66,7 @@ const PollingPage = ({ user }) => {
         user.role
       )
     ) {
-      alert("You don't have permission to vote.");
+      alert("Please create an account to vote.");
       return;
     }
 
