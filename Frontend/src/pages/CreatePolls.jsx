@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const CreatePoll = ({ user }) => {
   const navigate = useNavigate();
@@ -28,7 +30,7 @@ const CreatePoll = ({ user }) => {
     console.log("Creating poll with userId:", user?.userId); // Debugging
 
     if (!title.trim() || options.some((opt) => !opt.trim())) {
-      alert("Poll title and options cannot be empty!");
+      toast.error("Complete all fields!");
       return;
     }
 

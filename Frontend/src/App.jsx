@@ -5,6 +5,8 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import CreatePoll from "./pages/CreatePolls";
 import PollingPage from "./pages/PollingPage";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css"; // Import styles
 
 function App() {
   const [user, setUser] = useState(null); //Lifted state up for authentication
@@ -14,6 +16,8 @@ function App() {
   };
   return (
     <Router>
+      <ToastContainer position="top-center" autoClose={3000} />
+
       <Routes>
         <Route
           path="/"

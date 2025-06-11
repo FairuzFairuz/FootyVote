@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const PollingPage = ({ user }) => {
   const { pollId } = useParams();
@@ -66,7 +68,7 @@ const PollingPage = ({ user }) => {
         user.role
       )
     ) {
-      alert("Please create an account to vote.");
+      toast.error("Please create an account to vote.");
       return;
     }
 
@@ -93,12 +95,23 @@ const PollingPage = ({ user }) => {
       console.log("Updated poll results:", resultsData); // Debugging
       setResults([...resultsData.results]); // Update state
       //   setRefreshKey((prevKey) => prevKey + 1); // Triggers UI refresh
+
+      //  Show success toast after voting
+      toast.success("Thank you for voting!", {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "light",
+      });
     } catch (err) {
       console.error("Voting error:", err.message);
 
       if (err.message.includes("Vote denied")) {
         // Checks for specific error message
-        alert("Vote denied as you have voted in this poll before."); // Displays custom message
+        toast.error("Vote denied as you have voted in this poll before."); // Displays custom message
       } else {
         alert(err.message); // Shows other errors normally
       }
@@ -144,7 +157,7 @@ const PollingPage = ({ user }) => {
         user.role
       )
     ) {
-      alert("You must be logged in to post a comment.");
+      toast.error("You must be logged in to post a comment.");
       return;
     }
 
@@ -164,8 +177,18 @@ const PollingPage = ({ user }) => {
       console.log("New comment added:", data); // Debugging
       setComments([{ ...data.comment, username: user.username }, ...comments]); // Adds username from user state
       setNewComment(""); // Clears input after posting
+
+      toast.success("Thank you for your comment!", {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "light",
+      });
     } catch (err) {
-      alert(err.message);
+      toast.error(err.message);
       console.error("Error posting comment:", err.message);
     }
   };
@@ -189,7 +212,7 @@ const PollingPage = ({ user }) => {
       String(commentToDelete.user_id) !== String(user?.userId) &&
       user.role !== "admin"
     ) {
-      alert("You can only delete your own comments unless you're an admin.");
+      toast.error("Only the author or admin can delete this comment.");
       return;
     }
 
@@ -203,6 +226,15 @@ const PollingPage = ({ user }) => {
 
       console.log("Comment deleted successfully:", commentId); // Debugging
       setComments(comments.filter((c) => c.comment_id !== commentId)); // Instantly updates UI
+      toast.success("Comment deleted!", {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "light",
+      });
     } catch (err) {
       alert(err.message);
       console.error("Error deleting comment:", err.message);
@@ -227,7 +259,7 @@ const PollingPage = ({ user }) => {
 
     if (String(commentToEdit.user_id) !== String(user?.userId)) {
       console.error("User does not have permission to edit this comment.");
-      alert("Only the author can edit this comment.");
+      toast.error("Only the author can edit this comment.");
       return;
     }
 
